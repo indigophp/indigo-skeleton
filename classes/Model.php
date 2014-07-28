@@ -75,7 +75,7 @@ trait Model
 	}
 
 	/**
-	 * Handles properties caching
+	 * Handles property caching
 	 *
 	 * @param string $type
 	 *
@@ -99,6 +99,36 @@ trait Model
 		}
 
 		return static::$_skeleton_cached[$class][$type] = static::compile_properties($properties);
+	}
+
+	/**
+	 * List skeleton properties
+	 *
+	 * @return []
+	 */
+	public static function list_properties()
+	{
+		return static::skeleton_properties('list');
+	}
+
+	/**
+	 * Form skeleton properties
+	 *
+	 * @return []
+	 */
+	public static function form_properties()
+	{
+		return static::skeleton_properties('form');
+	}
+
+	/**
+	 * View skeleton properties
+	 *
+	 * @return []
+	 */
+	public static function view_properties()
+	{
+		return static::skeleton_properties('view');
 	}
 
 	/**
@@ -147,16 +177,6 @@ trait Model
 		}
 
 		return static::$_fieldsets_cached[$class] = $fieldsets;
-	}
-
-	public static function __callStatic($method, $args)
-	{
-		if (($type = strstr($method, '_properties', true)) !== false)
-		{
-			return static::skeleton_properties($type);
-		}
-
-		return parent::__callStatic($method, $args);
 	}
 
 	/**

@@ -30,7 +30,7 @@ class ModelTest extends Test
 	}
 
 	/**
-	 * @covers ::__callStatic
+	 * @covers ::list_properties
 	 * @covers ::skeleton_properties
 	 * @covers ::compile_properties
 	 */
@@ -49,7 +49,7 @@ class ModelTest extends Test
 	}
 
 	/**
-	 * @covers ::__callStatic
+	 * @covers ::form_properties
 	 * @covers ::skeleton_properties
 	 * @covers ::compile_properties
 	 */
@@ -72,24 +72,24 @@ class ModelTest extends Test
 	}
 
 	/**
-	 * @covers ::__callStatic
+	 * @covers ::view_properties
 	 * @covers ::skeleton_properties
 	 * @covers ::compile_properties
 	 */
-	public function testFakeProperties()
+	public function testViewProperties()
 	{
-		$properties = \DummyModel::fake_properties();
+		$properties = \DummyModel::view_properties();
+		$expected = [
+			'id' => [
+				'label' => 'ID',
+			],
+			'name' => [
+				'label' => 'Name',
+				'type'  => 'text',
+			],
+		];
 
-		$this->assertEquals([], $properties);
-	}
-
-	/**
-	 * @covers            ::__callStatic
-	 * @expectedException FuelException
-	 */
-	public function testBadCall()
-	{
-		\DummyModel::fake_call();
+		$this->assertEquals($expected, $properties);
 	}
 
 	/**

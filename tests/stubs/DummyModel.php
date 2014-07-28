@@ -37,8 +37,6 @@ class DummyModel extends \Orm\Model
 	protected static $_view_properties = [
 		'id',
 		'name',
-		'slug',
-		'description',
 	];
 
 	protected static $_dummy_properties = [
