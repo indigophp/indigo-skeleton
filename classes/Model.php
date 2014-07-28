@@ -28,25 +28,11 @@ trait Model
 	use \Fuel\Validation\RuleProvider\ModelProvider;
 
 	/**
-	 * Cached list properties
+	 * Cached skeleton properties
 	 *
 	 * @var []
 	 */
-	protected static $_list_cached = [];
-
-	/**
-	 * Cached form properties
-	 *
-	 * @var []
-	 */
-	protected static $_form_cached = [];
-
-	/**
-	 * Cached view properties
-	 *
-	 * @var []
-	 */
-	protected static $_view_cached = [];
+	protected static $_skeleton_cached = [];
 
 	/**
 	 * Cached fieldsets
@@ -98,11 +84,10 @@ trait Model
 	public static function skeleton_properties($type)
 	{
 		$class = get_called_class();
-		$cache = '_' . $type . '_cached';
 
-		if (array_key_exists($class, static::$$cache))
+		if (isset(static::$_skeleton_cached[$class][$type]))
 		{
-			return static::$$cache[$class];
+			return static::$_skeleton_cached[$class][$type];
 		}
 
 		$var = '_' . $type . '_properties';
@@ -113,37 +98,7 @@ trait Model
 			$properties = static::$$var;
 		}
 
-		return static::$$cache[$class] = static::compile_properties($properties);
-	}
-
-	/**
-	 * List properties
-	 *
-	 * @return []
-	 */
-	public static function list_properties()
-	{
-		return static::skeleton_properties('list');
-	}
-
-	/**
-	 * Form properties
-	 *
-	 * @return []
-	 */
-	public function form_properties()
-	{
-		return static::skeleton_properties('form');
-	}
-
-	/**
-	 * View properties
-	 *
-	 * @return []
-	 */
-	public function view_properties()
-	{
-		return static::skeleton_properties('view');
+		return static::$_skeleton_cached[$class][$type] = static::compile_properties($properties);
 	}
 
 	/**
@@ -151,7 +106,7 @@ trait Model
 	 *
 	 * @return []
 	 */
-	public function fieldsets()
+	public static function fieldsets()
 	{
 		$class = get_called_class();
 
@@ -171,6 +126,7 @@ trait Model
 				if (is_int($fieldset))
 				{
 					$fieldset = $config;
+					$config = null;
 				}
 
 				if (empty($config))
@@ -186,11 +142,21 @@ trait Model
 					];
 				}
 
-				$fieldsets[$key] = $config;
+				$fieldsets[$fieldset] = $config;
 			}
 		}
 
 		return static::$_fieldsets_cached[$class] = $fieldsets;
+	}
+
+	public static function __callStatic($method, $args)
+	{
+		if (($type = strstr($method, '_properties', true)) !== false)
+		{
+			return static::skeleton_properties($type);
+		}
+
+		return parent::__callStatic($method, $args);
 	}
 
 	/**
@@ -200,7 +166,7 @@ trait Model
 	{
 		static::$provider = $provider;
 
-		static::$provider->setData(static::form());
+		static::$provider->setData(static::form_properties());
 	}
 
 	/**
@@ -220,7 +186,7 @@ trait Model
 		}
 
 		// Loop through and add all fields
-		foreach (static::form() as $field => $config)
+		foreach (static::form_properties() as $field => $config)
 		{
 			$instance = static::generateInput($field, $config);
 
@@ -311,7 +277,7 @@ trait Model
 	 *
 	 * @return [] Array of form elements
 	 */
-	public static function generateFilters()
+	public static function generate_filters()
 	{
 		if (static::$builder === null)
 		{
@@ -321,7 +287,7 @@ trait Model
 		$form = [];
 
 		// Loop through and add all fields
-		foreach (static::lists() as $field => $config)
+		foreach (static::list_properties() as $field => $config)
 		{
 			$form[] = static::generateInput($field, $config);
 		}

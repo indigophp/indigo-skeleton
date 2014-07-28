@@ -1,0 +1,33 @@
+{
+    "name": "indigophp/indigo-skeleton",
+    "type": "fuel-package",
+    "description": "Indigo skeleton package",
+    "license": "MIT",
+    "keywords": ["indigo", "skeleton"],
+    "homepage": "https://indigophp.com",
+    "authors": [
+        {
+            "name": "Márk Sági-Kazár",
+            "email": "mark.sagikazar@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "~2.0.0",
+        "indigophp/fuel-core": "dev-develop",
+        "fuelphp/fieldset": "dev-master",
+        "fuelphp/validation": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Indigo\\Skeleton\\": "classes/"
+        }
+    },
+    "extra": {
+        "installer-name": "skeleton"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
