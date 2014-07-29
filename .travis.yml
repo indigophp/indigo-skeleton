@@ -3,11 +3,8 @@ php:
   - 5.4
   - 5.5
 
-script: vendor/bin/codecept run unit --coverage-xml
+script: vendor/bin/codecept run
 
 before_script:
   - composer install --prefer-source
-  - wget https://scrutinizer-ci.com/ocular.phar
-
-after_script:
-  - php ocular.phar code-coverage:upload --format=php-clover tests/_output/coverage.xml
+  - composer create-project --prefer-source fuel/fuel:dev-1.8/develop /tmp/fuel
