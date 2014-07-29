@@ -13,14 +13,12 @@ namespace Indigo\Skeleton;
 
 use Orm\Model;
 use Orm\Query;
-use Fuel\Validation\Validator;
-use Fuel\Fieldset\Form;
 use League\Fractal;
 
 /**
- * Skeleton Controller
+ * Controller
  *
- * Basic skeleton controller
+ * Skeleton Controller component
  *
  * @author Márk Sági-Kazár <mark.sagikazar@gmail.com>
  */
@@ -31,7 +29,7 @@ trait Controller
 	 *
 	 * @return string
 	 */
-	abstract public function getModule();
+	abstract public function get_module();
 
 	/**
 	 * Returns a translated name based on count
@@ -40,72 +38,58 @@ trait Controller
 	 *
 	 * @return string
 	 */
-	abstract public function getName($count = 1);
+	abstract public function get_name($count = 1);
 
 	/**
 	 * Returns the model name
 	 *
 	 * @return string
 	 */
-	abstract public function getModel();
+	abstract public function get_model();
 
 	/**
 	 * Returns the URL
 	 *
 	 * @return string
 	 */
-	abstract public function getUrl();
+	abstract public function get_url();
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function before($data = null)
+	public function before()
 	{
-		parent::before($data);
+		parent::before();
 
-		$this->access();
-
-		\View::set_global('module', $this->getModule());
-		\View::set_global('item', $this->getName());
-		\View::set_global('items', $this->getName(999));
-		\View::set_global('url', $this->getUrl());
+		$this->init();
 	}
 
 	/**
-	 * Returns a translated name based on count
-	 *
-	 * @param integer $count
-	 *
-	 * @return string
+	 * Loads skeleton
 	 */
-	public function getName($count = 1)
+	protected function init()
 	{
-		return ngettext($this->name[0], $this->name[1], $count);
+		$this->check_access();
+
+		$this->template->set_global('module', $this->get_module());
+		$this->template->set_global('item', $this->get_name());
+		$this->template->set_global('items', $this->get_name(999));
+		$this->template->set_global('url', $this->get_url());
 	}
 
 	/**
-	 * Overrideable method to create new view
-	 *
-	 * @see Fuel\Core\Theme::view
-	 *
-	 * @return View
+	 * Checks whether user has access to an action
 	 */
-	public function view($view, $data = [], $auto_filter = null)
+	protected function check_access($action = null)
 	{
-		return $this->theme->view($view, $data, $auto_filter);
-	}
+		is_null($action) and $action = $this->request->action;
 
-	/**
-	 * Checks whether user has acces to view page
-	 */
-	protected function checkAccess($access = null)
-	{
-		if ($this->hasAccess($this->request->action) === false)
+		if ($this->has_access($action) === false)
 		{
 			$context = array(
 				'form' => array(
-					'%action%' => $this->request->action,
-					'%items%'  => $this->name(999),
+					'%action%' => $action,
+					'%items%'  => $this->get_name(999),
 				)
 			);
 
@@ -122,9 +106,9 @@ trait Controller
 	 *
 	 * @return boolean
 	 */
-	public function hasAccess($access)
+	public function has_access($access)
 	{
-		return \Auth::has_access($this->getModule() . '.' . $access);
+		return \Auth::has_access($this->get_module() . '.' . $access);
 	}
 
 	/**
@@ -134,7 +118,7 @@ trait Controller
 	 *
 	 * @return this
 	 */
-	public function setTitle($title)
+	public function set_title($title)
 	{
 		$this->template->set_global('title', $title);
 
@@ -144,13 +128,13 @@ trait Controller
 	/**
 	 * Creates a new query
 	 *
-	 * @param array $options
+	 * @param [] $options
 	 *
 	 * @return Query
 	 */
 	protected function query($options = [])
 	{
-		return call_user_func(array($this->model, 'query'), $options);
+		return call_user_func([$this->get_model(), 'query'], $options);
 	}
 
 	/**
@@ -182,7 +166,7 @@ trait Controller
 	 */
 	protected function forge($data = [], $new = true, $view = null, $cache = true)
 	{
-		return call_user_func(array($this->model, 'forge'), $data, $new, $view, $cache);
+		return call_user_func([$this->get_model(), 'forge'], $data, $new, $view, $cache);
 	}
 
 	/**
@@ -192,7 +176,7 @@ trait Controller
 	 */
 	public function form()
 	{
-		return call_user_func(array($this->model, 'forgeForm'));
+		return call_user_func([$this->get_model(), 'forgeForm']);
 	}
 
 	/**
@@ -202,7 +186,7 @@ trait Controller
 	 */
 	public function validation()
 	{
-		return call_user_func(array($this->model, 'forgeValidator'));
+		return call_user_func([$this->get_model(), 'forgeValidator']);
 	}
 
 	/**
@@ -210,11 +194,11 @@ trait Controller
 	 *
 	 * @param boolean $actions Use actions
 	 *
-	 * @return SkeletonTransformer
+	 * @return Transformer
 	 */
 	protected function transformer($actions = true)
 	{
-		return new Fractal\Transformer\SkeletonTransformer($this, $actions);
+		return new Transformer($this, $actions);
 	}
 
 	/**
@@ -224,11 +208,11 @@ trait Controller
 	 */
 	public function filters()
 	{
-		return call_user_func(array($this->model, 'generateFilters'));
+		return call_user_func([$this->get_model(), 'generate_filters']);
 	}
 
 	/**
-	 * Redirect page
+	 * Redirects a page
 	 *
 	 * @param string  $url
 	 * @param string  $method
@@ -372,7 +356,7 @@ trait Controller
 	{
 		if ($ext = $this->is_ajax())
 		{
-			$properties = call_user_func(array($this->model, 'lists'));
+			$properties = call_user_func([$this->get_model(), 'list_properties']);
 
 			$query = $this->query();
 
@@ -400,7 +384,7 @@ trait Controller
 		}
 		else
 		{
-			$this->set_title(ucfirst($this->name(999)));
+			$this->set_title(ucfirst($this->get_name(999)));
 
 			$this->template->content = $this->view('admin/skeleton/list');
 			$this->template->content->set('filters', $this->filters(), false);
@@ -427,7 +411,7 @@ trait Controller
 				$context = array(
 					'template' => 'success',
 					'from'     => '%item%',
-					'to'       => $this->name(),
+					'to'       => $this->get_name(),
 				);
 
 				\Logger::instance('alert')->info(gettext('%item% successfully created.'), $context);
@@ -446,7 +430,7 @@ trait Controller
 			}
 		}
 
-		$this->set_title(ucfirst(strtr(gettext('New %item%'), ['%item%' => $this->name()])));
+		$this->set_title(ucfirst(strtr(gettext('New %item%'), ['%item%' => $this->get_name()])));
 
 		$this->template->content = $this->view('admin/skeleton/create');
 		$this->template->content->set('form', $form, false);
@@ -457,7 +441,7 @@ trait Controller
 	{
 		$model = $this->find($id);
 
-		$this->set_title(strtr(gettext('View %item%'), ['%item%' => $this->name()]));
+		$this->set_title(strtr(gettext('View %item%'), ['%item%' => $this->get_name()]));
 		$this->template->content = $this->view('admin/skeleton/view');
 		$this->template->content->set('model', $model, false);
 	}
@@ -482,7 +466,7 @@ trait Controller
 				$context = array(
 					'template' => 'success',
 					'from'     => '%item%',
-					'to'       => $this->name(),
+					'to'       => $this->get_name(),
 				);
 
 				\Logger::instance('alert')->info(gettext('%item% successfully created.'), $context);
@@ -505,7 +489,7 @@ trait Controller
 			$form->populate($model);
 		}
 
-		$this->set_title(strtr(gettext('Edit %item%'), ['%item%' => $this->name()]));
+		$this->set_title(strtr(gettext('Edit %item%'), ['%item%' => $this->get_name()]));
 
 		$this->template->content = $this->view('admin/skeleton/edit');
 		$this->template->content->set('model', $model, false);
@@ -519,7 +503,7 @@ trait Controller
 
 		$context = array(
 			'from' => '%item%',
-			'to'   => $this->name(),
+			'to'   => $this->get_name(),
 		);
 
 		if ($model->delete())

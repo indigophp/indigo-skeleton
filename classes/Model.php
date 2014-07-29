@@ -71,7 +71,7 @@ trait Model
 			$properties[$key] = $value;
 		}
 
-		return array_filter($properties);
+		return $properties;
 	}
 
 	/**
