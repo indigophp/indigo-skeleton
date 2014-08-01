@@ -17,3 +17,5 @@ $_SERVER['package_path'] = $fuel . '/fuel/packages';
 $_SERVER['vendor_path']  = $fuel . '/fuel/vendor';
 
 require_once $_SERVER['core_path'] . '/bootstrap_phpunit.php';
+
+\Package::load('orm');
