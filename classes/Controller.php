@@ -516,6 +516,6 @@ trait Controller
 			\Logger::instance('alert')->error(gettext('%item% cannot be deleted.'), $context);
 		}
 
-		return \Response::redirect_back();
+		return $this->redirect($this->get_url());
 	}
 }
