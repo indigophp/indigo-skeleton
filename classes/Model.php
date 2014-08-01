@@ -275,8 +275,8 @@ trait Model
 					$config['content'][] = [
 						'type'    => 'option',
 						'value'   => $value,
-						'content' => $field,
-						'label'   => $contentName
+						'content' => $contentName, // FIXME
+						'label'   => $contentName,
 					];
 				}
 			}
