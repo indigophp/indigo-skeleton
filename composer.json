@@ -26,9 +26,6 @@
             "Indigo\\Skeleton\\": "classes/"
         }
     },
-    "extra": {
-        "installer-name": "skeleton"
-    },
     "prefer-stable": true,
     "minimum-stability": "dev"
 }
