@@ -1,6 +1,5 @@
 {
     "name": "indigophp/indigo-skeleton",
-    "type": "fuel-package",
     "description": "Indigo skeleton package",
     "license": "MIT",
     "keywords": ["indigo", "skeleton"],
@@ -12,13 +11,15 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "indigophp/fuel-core": ">=1.0.2"
     },
     "require-dev": {
-        "codeception/codeception": "~2.0.0",
         "indigophp/fuel-core": "dev-develop",
         "fuelphp/fieldset": "dev-master",
-        "fuelphp/validation": "dev-master"
+        "fuelphp/validation": "dev-master",
+        "codeception/codeception": "~2.0.0",
+        "indigophp/codeception-fuel-module": "dev-develop"
     },
     "autoload": {
         "psr-4": {
